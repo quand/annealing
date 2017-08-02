@@ -1,6 +1,6 @@
 package com.company;
 
-/**
+/*
  * Реализация решения судоку с помошью метода имитации отжига
  */
 
@@ -10,34 +10,10 @@ import java.io.IOException;
 import java.util.*;
 
 public class Anneal {
-    static Random rnd = new Random();
+    private static Random rnd = new Random();
 
     private static int[][] read(String input) {
-        char[][] array=new char[9][11];
-        int[][] matrix=new int[9][9];  /* = {
-                { 0, 0, 6, 2, 0, 0, 0, 8, 0 },
-                { 0, 0, 8, 9, 7, 0, 0, 0, 0 },
-                { 0, 0, 4, 8, 1, 0, 5, 0, 0 },
-
-                { 0, 0, 0, 0, 6, 0, 0, 0, 2 },
-                { 0, 7, 0, 0, 0, 0, 0, 3, 0 },
-                { 6, 0, 0, 0, 5, 0, 0, 0, 0 },
-
-                { 0, 0, 2, 0, 4, 7, 1, 0, 0 },
-                { 0, 0, 3, 0, 2, 8, 4, 0, 0 },
-                { 0, 5, 0, 0, 0, 1, 2, 0, 0 }};*/
-/*
-                {1, 0, 4, 0, 2, 9, 0, 0, 0},
-                {0, 0, 2, 0, 0, 8, 6, 3, 0},
-                {8, 0, 0, 6, 0, 0, 0, 2, 4},
-                {0, 5, 0, 0, 8, 0, 0, 1, 6},
-                {9, 1, 6, 5, 0, 4, 2, 8, 7},
-                {2, 8, 0, 0, 6, 0, 0, 5, 0},
-                {7, 2, 0, 0, 0, 6, 0, 0, 1},
-                {0, 4, 1, 7, 0, 0, 8, 0, 0},
-                {0, 0, 0, 1, 4, 0, 7, 0, 5}};
-        */
-
+        int[][] matrix = new int[9][9];
         try {
             List<String> list = new ArrayList<>();
             Scanner in = new Scanner(new File(input));
@@ -83,7 +59,6 @@ public class Anneal {
             int row = corners[0], col = corners[1];
             for (int i = row; i < row + 3; ++i) {
                 for (int j = col; j < col + 3; ++j) {
-                    //int v = problem[i][j];
                     if (matrix[i][j] != 0) // a fixed starting number
                         val.remove(val.indexOf(matrix[i][j]));
                 }
@@ -167,7 +142,7 @@ public class Anneal {
     }
 
     private static ArrayList shuffledList() {
-        ArrayList<Integer> list = new ArrayList();
+        ArrayList list = new ArrayList();
         for (int i = 1; i <= 9; i++)
             list.add(i);
         Collections.shuffle(list);
@@ -177,8 +152,7 @@ public class Anneal {
     private static int[][] DuplicateMatrix(int[][] matrix) {
         int[][] result = CreateMatrix(9);
         for (int i = 0; i < 9; ++i)
-            for (int j = 0; j < 9; ++j)
-                result[i][j] = matrix[i][j];
+            System.arraycopy(matrix[i], 0, result[i], 0, 9);
         return result;
     }
 
@@ -197,13 +171,10 @@ public class Anneal {
         int[][] result = DuplicateMatrix(matrix);
 
         int block = rnd.nextInt(9);  // [0,8]
-        //Console.WriteLine("block = " + block);
         int[] corners = Corner(block);
-        //Console.WriteLine("corners = " + corners[0] + " " + corners[1]);
         ArrayList<int[]> cells = new ArrayList();
         for (int i = corners[0]; i < corners[0] + 3; ++i) {
             for (int j = corners[1]; j < corners[1] + 3; ++j) {
-                //Console.WriteLine("problem " + i + " " + j + " = " + problem[i][j]);
                 if (original[i][j] == 0)  // a non-fixed value
                 {
                     cells.add(new int[]{i, j});
@@ -212,8 +183,6 @@ public class Anneal {
         }
 
         if (cells.size() < 2) {
-            //Console.WriteLine("Cells count = " + cells.Count);
-            //throw new Exception("block " + block + " doesn't have two values to swap!");
             return null;
         }
 
@@ -221,15 +190,11 @@ public class Anneal {
         int k1 = rnd.nextInt(cells.size());  // 0,1,2,3
         int inc = rnd.nextInt(cells.size() - 1) + 1;  // 1,2,3
         int k2 = (k1 + inc) % cells.size();
-        //Console.WriteLine("k1 k2 = " + k1 + " " + k2);
 
         int r1 = cells.get(k1)[0];
         int c1 = cells.get(k1)[1];
         int r2 = cells.get(k2)[0];
         int c2 = cells.get(k2)[1];
-
-        //Console.WriteLine("r1 c1 = " + r1 + " " + c1);
-        //Console.WriteLine("r2 c2 = " + r2 + " " + c2);
 
         int tmp = result[r1][c1];
         result[r1][c1] = result[r2][c2];
@@ -269,9 +234,7 @@ public class Anneal {
     private static boolean checkProbability(int deltaE, double temperature) {
         double p = Math.exp(-deltaE / temperature);
         double val = rnd.nextDouble();
-        if (val <= p)
-            return true;
-        else return false;
+        return val <= p;
     }
 
     public static void main(String[] args) {
