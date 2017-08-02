@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="module_annealing" default="compile.module.annealing">
+  <dirname property="module.annealing.basedir" file="${ant.file.module_annealing}"/>
+  
+  <property name="module.jdk.home.annealing" value="${project.jdk.home}"/>
+  <property name="module.jdk.bin.annealing" value="${project.jdk.bin}"/>
+  <property name="module.jdk.classpath.annealing" value="${project.jdk.classpath}"/>
+  
+  <property name="compiler.args.annealing" value="-encoding UTF-8 -source 1.8 -target 1.8 ${compiler.args}"/>
+  
+  <property name="annealing.output.dir" value="${module.annealing.basedir}/out/production/annealing"/>
+  <property name="annealing.testoutput.dir" value="${module.annealing.basedir}/out/test/annealing"/>
+  
+  <path id="annealing.module.bootclasspath">
+    <!-- Paths to be included in compilation bootclasspath -->
+  </path>
+  
+  <path id="annealing.module.production.classpath">
+    <path refid="${module.jdk.classpath.annealing}"/>
+  </path>
+  
+  <path id="annealing.runtime.production.module.classpath">
+    <pathelement location="${annealing.output.dir}"/>
+  </path>
+  
+  <path id="annealing.module.classpath">
+    <path refid="${module.jdk.classpath.annealing}"/>
+    <pathelement location="${annealing.output.dir}"/>
+  </path>
+  
+  <path id="annealing.runtime.module.classpath">
+    <pathelement location="${annealing.testoutput.dir}"/>
+    <pathelement location="${annealing.output.dir}"/>
+  </path>
+  
+  
+  <patternset id="excluded.from.module.annealing">
+    <patternset refid="ignored.files"/>
+  </patternset>
+  
+  <patternset id="excluded.from.compilation.annealing">
+    <patternset refid="excluded.from.module.annealing"/>
+  </patternset>
+  
+  <path id="annealing.module.sourcepath">
+    <dirset dir="${module.annealing.basedir}">
+      <include name="src"/>
+    </dirset>
+  </path>
+  
+  
+  <target name="compile.module.annealing" depends="compile.module.annealing.production,compile.module.annealing.tests" description="Compile module annealing"/>
+  
+  <target name="compile.module.annealing.production" depends="register.custom.compilers" description="Compile module annealing; production classes">
+    <mkdir dir="${annealing.output.dir}"/>
+    <javac2 destdir="${annealing.output.dir}" debug="${compiler.debug}" nowarn="${compiler.generate.no.warnings}" memorymaximumsize="${compiler.max.memory}" fork="true" executable="${module.jdk.bin.annealing}/javac">
+      <compilerarg line="${compiler.args.annealing}"/>
+      <bootclasspath refid="annealing.module.bootclasspath"/>
+      <classpath refid="annealing.module.production.classpath"/>
+      <src refid="annealing.module.sourcepath"/>
+      <patternset refid="excluded.from.compilation.annealing"/>
+    </javac2>
+    
+    <copy todir="${annealing.output.dir}">
+      <fileset dir="${module.annealing.basedir}/src">
+        <patternset refid="compiler.resources"/>
+        <type type="file"/>
+      </fileset>
+    </copy>
+  </target>
+  
+  <target name="compile.module.annealing.tests" depends="register.custom.compilers,compile.module.annealing.production" description="compile module annealing; test classes" unless="skip.tests"/>
+  
+  <target name="clean.module.annealing" description="cleanup module">
+    <delete dir="${annealing.output.dir}"/>
+    <delete dir="${annealing.testoutput.dir}"/>
+  </target>
+</project>

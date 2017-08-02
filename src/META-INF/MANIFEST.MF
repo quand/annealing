@@ -1,0 +1,4 @@
+Manifest-Version: 1.0
+Class-Path: /Users/user/IdeaProjects/annealing/src/com/company/Main.java
+Main-Class: com.company.Anneal
+
